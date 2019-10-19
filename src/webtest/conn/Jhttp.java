@@ -17,7 +17,6 @@ public class Jhttp {
 		check(a);
 		init();
 	}
-
 	private void check(String a) {
 		// TODO Auto-generated method stub
 		if (!a.startsWith("http")) {
@@ -26,12 +25,6 @@ public class Jhttp {
 		url = a;
 		System.out.println(a);
 	}
-
-	public static void main(String[] args) {
-		Jhttp hp = new Jhttp("http://localhost/pcode/gethint.php");
-		System.out.println(hp.send());
-	}
-
 	public int getstatus() {
 		try {
 			return con.getResponseCode();

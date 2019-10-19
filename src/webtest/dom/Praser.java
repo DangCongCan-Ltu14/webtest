@@ -1,27 +1,40 @@
 package webtest.dom;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Node;
 
 public class Praser {
-	public static Document init(String a) {
-		try {
+	static void tree(Node k) {
+		List<Node> ps = k.childNodes();
+		if (k.nodeName() == "#text") {
+			System.out.println(k.toString());
+		}
+		for (Node ss : ps) {
+			tree(ss);
+		}
+	}
 
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder;
-			builder = factory.newDocumentBuilder();
-			Document document = builder.parse(new File(a));
-			System.out.println("ok");
-			return document;
-		} catch (Exception e) {
+	public static Node getNode(Document c) {
+		return (Node) c.ownerDocument();
+	}
+
+	public static Document getFile(String s) {
+		File fl = new File(s);
+		try {
+			return Jsoup.parse(fl, null);
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return null ;
+			return null;
 		}
+	}
 
+	public static Document getDoc(String s) {
+		return Jsoup.parse(s);
 	}
 }

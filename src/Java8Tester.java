@@ -4,45 +4,62 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class Java8Tester {
 
+	private final static String NASHORN_ARGS = "nashorn.args";
+
+	private final static String ES_6 = "--language=es6";
+
 	public static void main(String args[]) {
 		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document document = builder.parse(new File("students.xml"));
-			// Normalize the XML Structure; It's just too important !!
-			document.getDocumentElement().normalize();
-			Node root = document.getDocumentElement();
-			tree(root);
+			System.setProperty(NASHORN_ARGS, ES_6);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(new File("students.xml"));
+			tree(doc.getDocumentElement(),0);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
+	/**
+	 * @param el  mode nhap vao
+	 * @param k muc cua cay 
+	 * khong tra ve 
+	 */
+	static void tree(Node el, int k) {
+		// TODO Auto-generated method stub
+		pr(k);
+		System.out.println("<" + el.getNodeName() + ">");
+		pr(k);
+		System.out.println("node value " + el.getNodeValue());
 
-	static void tree(Node node) {
-
-		if (node.getNodeType() == Node.ELEMENT_NODE) {
-			System.out.println("<" + node.getNodeName() + ">");
-			NodeList ns = node.getChildNodes();
-			int z = ns.getLength();
-			if (z > 2) {
-				int i;
-				for (i = 0; i < z; i++) {
-					Node np = ns.item(i);
-					tree(np);
-				}
+		NodeList nl = el.getChildNodes();
+		int v = nl.getLength();
+		int ll = k + 1;
+		for (int i = 0; i < v; i++) {
+			Node p = nl.item(i);
+			if (p.getNodeName().equals("#text")) {
+				if (p.getNodeValue() != null)
+					if (p.getNodeValue().trim().length() > 1)
+						tree(p, ll);
 			} else
-				System.out.println(ns.item(0).getNodeValue());
-			System.out.println("</" + node.getNodeName() + ">");
-		} else {
-			// System.out.println(node.getNodeType() + ": " +node.getNodeName());
+				tree(p, ll);
+
+		}
+		pr(k);
+		System.out.println("</" + el.getNodeName() + ">");
+		// System.out.println();
+	}
+
+	private static void pr(int k) {
+		// TODO Auto-generated method stub
+		for (int i = 0; i < k; i++) {
+			System.out.print("  ");
 		}
 	}
 

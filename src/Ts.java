@@ -1,14 +1,11 @@
-import java.util.ArrayList;
-
 public class Ts {
-	ArrayList<Object> aa = new ArrayList<Object>();
-
-	public void put(Object s) {
-		aa.add(s);
+	public int a=10,b=20;
+	public static void main(String[] args) {
+		call(8,9,5,6,6,6,6);
 	}
-
-	public Object get(int a) {
-		return aa.get(a);
+	static void call(int...arg)
+	{
+		int d=arg.length;
+		System.out.println(d);
 	}
-	public static String cmn="dkckckc";
 }
