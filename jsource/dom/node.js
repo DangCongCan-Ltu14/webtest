@@ -1,9 +1,17 @@
-let _attr =function (d, b) {
+var _attr =function (d, b) {
 	this.nodeName = d;
 	this.nodeValue = b;
 	this.nodeType = 3;
 }
-
+var _text = function (a)
+{
+	this.nodeName = "#text";
+	this.nodeValue = a;
+	this.nodeType = 1;
+	this.nextSibling = null;
+	this.previousSibling = null;
+	this.parent ;
+}
 var _Node =function () {
 	this.parent;// link to parent node
 	this.nodeValue;
