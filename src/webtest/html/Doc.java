@@ -5,6 +5,7 @@ import java.util.Set;
 
 import jdk.nashorn.api.scripting.JSObject;
 
+@SuppressWarnings("removal")
 public class Doc implements JSObject {
 
 	@Override

@@ -9,6 +9,7 @@ function XMLHttpRequest (){
 	
 	this.open = function(method, url,sys)
 	{
+		// can lay url tu document
 		this.http=new Jhttp(url);
 		this.http.setMethod(method);
 		if(this.http.err==false) this.readyState=1;

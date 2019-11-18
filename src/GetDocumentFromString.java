@@ -4,33 +4,41 @@ import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
+import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 
 public class GetDocumentFromString {
 
 	public static void main(String[] args) throws IOException {
-		String htmlString = "<html><head><title>Simple Page</title></head>"
-				+ "<body>Hello<p id=\"demo\">ss<h1 cmn=\"xxxsq\" id = \"sw\">xxx</h1>ss</p><br></body></html>";
+		String htmlString = "<p id = \"vc\" >hi "
+				+ "cmn ba </p><p>ss <input id =\"cmn\" readonly value=\"hello\">";
 		Document doc = Jsoup.parse(htmlString);
-		Node sl = doc.ownerDocument();
-		tree(sl, 0);
+		Element sl = doc.body();
+		Element in =sl.getElementById("cmn");
+		Attributes sk = in.attributes();
+		List<Attribute> ss=sk.asList();
+		for(Attribute p:ss)
+		{
+			System.out.println(p.getKey());
+		}
 
 	}
 
 	static void tree(Node el, int k) {
 		List<Node> lp = el.childNodes();
-		List<Attribute> lps=el.attributes().asList();
-		if(lps!=null)
-		{
-			for(Attribute e:lps)
-				System.out.println("attr "+e.getKey());
-		}
+		List<Attribute> lps = el.attributes().asList();
+		
 		pr(k);
 		if (el.nodeName() == "#text")
 			System.out.println(el.outerHtml());
 		else {
 			System.out.println("<" + el.nodeName() + ">");
+		}
+		if (lps != null) {
+			for (Attribute e : lps)
+				System.out.println("attr " + e.getKey());
 		}
 		int d = k + 1;
 		for (Node nd : lp) {

@@ -5,82 +5,79 @@ load(System.getenv("WEBTEST") + "/jsource/dom/node.js");
 // jjs -cp /home/dccan/Desktop/web.jar --language=es6 Dom2.js
 var k = System.currentTimeMillis();
 {
-	let Document = function (ap)
-	{
-		this.node = ap ;
-		this.createElement = function (d)
-		{
+	let Document = function(ap) {
+		this.node = ap;
+		this.createElement = function(d) {
 			let np = new _Node();
-			np.nodeType  = 3;
+			np.nodeType = 3;
 			np.nodeName = d;
-			np.tag = d ;
-			return np ;
+			np.tag = d;
+			return np;
 		}
-		this.createTextNode = function (d)
-		{
+		this.createTextNode = function(d) {
 			return new _text(d);
 		}
-		this.createAttribute = function (d)
-		{
+		this.createAttribute = function(d) {
 			let np = new _attr();
-			np.nodeName = d ;
-			return np ;
+			np.nodeName = d;
+			return np;
 		}
-		this.createComment = function (d)
-		{
+		this.createComment = function(d) {
 			let np = new _Node();
-			np.nodeName ="#comment" ;
+			np.nodeName = "#comment";
 			np.tag = "#comment";
 			np.nodeValue = d;
-			return np ;
+			return np;
 		}
 	}
 	var DOMParser = function() {
-		//let doc  ;
+		// let doc ;
+		
 		this.praseFile = function() {
+			
 			System.gc();
-			let Get = Java.type("webtest.dom.Praser");
-			let d = Get.getFile("/home/dccan/Desktop/book.xml");
+			let _JGet = Java.type("webtest.dom.Praser");
+			let d = _JGet.getFile("/home/dccan/Desktop/book.xml");
 			let np = new _Node();
-			let al = Get.getNode(d);
-			//doc = new Document(np);
-			tree(al, np);
+			let al = _JGet.getNode(d);
+			// doc = new Document(np);
+			_tree(al, np);
 			np._config();
 			return np;
 		}
-		let tree = function(el, np) {
-			let lp = el.childNodes();
-			let lps = el.attributes().asList();
-			let d = lps.size();
-			let i;
-			if (d > 0) {
+	}
+	var _tree = function(el, np) {
+		let lp = el.childNodes();
+		let lps = el.attributes().asList();
+		let d = lps.size();
+		let i;
+		if (d > 0) {
 
-				for (i = 0; i < d; i++) {
-					let e = lps.get(i);
-					let attr = new _attr(e.getKey(), e.getValue());
-					np.setAttributeNode(attr);
-				}
+			for (i = 0; i < d; i++) {
+				let e = lps.get(i);
+				let attr = new _attr(e.getKey(), e.getValue());
+				np.setAttributeNode(attr);
 			}
+		}
 
-			np.tag = el.nodeName();
-			np.nodeName = el.nodeName();
-			if (el.nodeName() == "#text") {
-				np.nodeValue = el.toString();
-				np.nodeType = 3;
-			} else if (el.nodeName() == "#comment") {
-				np.nodeType = 2;
-			} else if (el.nodeName() == "#cdata") {
-				np.nodeType = 4;
-			} else {
-				np.nodeType = 1;// / elements
-			}
+		np.tag = el.nodeName();
+		np.nodeName = el.nodeName();
+		if (el.nodeName() == "#text") {
+			np.nodeValue = el.toString();
+			np.nodeType = 3;
+		} else if (el.nodeName() == "#comment") {
+			np.nodeType = 2;
+		} else if (el.nodeName() == "#cdata") {
+			np.nodeType = 4;
+		} else {
+			np.nodeType = 1;// / elements
+		}
 
-			if (lp != null) {
-				d = lp.size();
-				for (i = 0; i < d; i++) {
-					let nd = np._createnode();
-					tree(lp.get(i), nd);
-				}
+		if (lp != null) {
+			d = lp.size();
+			for (i = 0; i < d; i++) {
+				let nd = np._createnode();
+				_tree(lp.get(i), nd);
 			}
 		}
 	}

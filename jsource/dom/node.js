@@ -11,6 +11,7 @@ var _text = function (a)
 	this.nextSibling = null;
 	this.previousSibling = null;
 	this.parent ;
+	// se viet lai sau
 }
 var _Node =function () {
 	this.parent;// link to parent node

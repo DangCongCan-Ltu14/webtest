@@ -10,24 +10,31 @@ import org.jsoup.nodes.Node;
 
 public class Praser {
 	public static void main(String[] args) {
-		Document c=getFile("students.xml");
-		Node s=c.ownerDocument();
+		Document c = getFile("students.xml");
+		Node s = c.ownerDocument();
 		tree(s);
 	}
+
 	static void tree(Node k) {
 		List<Node> ps = k.childNodes();
-		System.out.println("<"+k.nodeName()+">");
+		System.out.println("<" + k.nodeName() + ">");
 		if (k.nodeName() == "#text") {
 			System.out.println(k.toString());
 		}
 		for (Node ss : ps) {
 			tree(ss);
 		}
-		System.out.println("</"+k.nodeName()+">");
+		System.out.println("</" + k.nodeName() + ">");
 	}
 
 	public static Node getNode(Document c) {
 		return (Node) c.ownerDocument();
+	}
+
+	public static Node pInner(String s) {
+		Document doc = Jsoup.parse(s);
+		Node sl =(Node) doc.body();
+		return sl;
 	}
 
 	public static Document getFile(String s) {
