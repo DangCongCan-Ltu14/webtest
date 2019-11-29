@@ -4,15 +4,15 @@ package webtest.query;
 import java.util.ArrayList;
 
 public class Ele {
-	private Pice[] pc;
-//	private int ope = 0;
+	protected Pice[] pc;
+	private int ope = 0;
 
 	public Pice get(int i) {
 		return pc[i];
 	}
 
-	public int ope(int v) {
-		return Compare.checpe(pc, v);
+	public int pnode() {
+		return ope;
 	}
 
 	public int length() {
@@ -21,6 +21,7 @@ public class Ele {
 
 	public Ele(ArrayList<String> as) {
 		separate(as);
+		ope = Compare.checkp(pc);
 	}
 
 // viec tach code co the lam dong thoi khi phan tich cu phap

@@ -1,340 +1,569 @@
 "use strict";
-let System = Java.type("java.lang.System");
-let _JGet = Java.type("webtest.dom.Praser");
-// load(System.getenv("WEBTEST") + "/jsource/dom/node.js");
 {
-	load(System.getenv("WEBTEST") + "/jsource/dom/Dom2.js");
+	let System = Java.type("java.lang.System");
+	let _JGet = Java.type("webtest.dom.Praser");
+	// load(System.getenv("WEBTEST") + "/jsource/dom/node.js");
+	let Extract = Java.type("webtest.query.Extract");
 	let nelement = 3;
 	let ntext = 1;
 
-	let attr = function(a,b) {
-		let dname =a ;//.toLowerCase();
-		this.value = b;
+	let attr = function(a) {
+		let dname = a;// .toLowerCase();
+		// this.value = b;
 		this.specified = true;
-		Object.defineProperty(this,"name",{value : dname }) ;
-		this.isId= function()
-		{
-			return name == "id" ;
+		Object.defineProperty(this, "name", {
+			value : dname
+		});
+		this.isId = function() {
+			return name == "id";
 		}
 	}
-
-	let Clist = function (ele)
-	{
-		let link = ele ;
-
-	this.add = function(...d) // khong ho tro
-	{
-		let cl =link.getAttributeNode("class");
-		if(cl==undefined) return ;
-		let d=cl.split(" ");
-		for(let z in d)
+	var _makeAtt = function() {
+		let attributes = [];
+		attributes.getNamedItem = function(d) {
+			let l = this.length;
+			let i;
+			for (i = 0; i < l; i++) {
+				if (this[i].name == d)
+					return this[i];
+			}
+			return null;
+		}
+		attributes.item = function(d) {
+			return this[d];
+		}
+		attributes.removeNamedItem = function(d) {
+			let k = this.length;
+			let i;
+			for (i = 0; i < k; i++) {
+				if (this[i].name == d) {
+					this.splice(i, 1);
+					return;
+				}
+			}
+		}
+		attributes.setNamedItem = function(d) {
+			let k = this.length;
+			let i;
+			for (i = 0; i < k; i++) {
+				if (this[i].name == d.name) {
+					this[i] = d;
+					return;
+				}
+			}
+			this[k] = d;
+		}
+		attributes.toString=function()
 		{
-			let h=d[z];
-			if(typeof (d)=="string"&&(!cl.value.contains(h)))
+			let s="";
+			let lg = this.length ;
+			for(let i =0;i<lg;i++)
 			{
-				cl.value = cl.value + " "+d ;
+				s=s+this[i].name+" = "+this[i].value+" ";
+			}
+			return s;
+		}
+		return attributes;
+	}
+	let Clist = function(ele) {
+		let link = ele;
+		let ctain = function(list, p) {
+			for ( let i in list) {
+				if (list[i].equals(p))
+					return true;
+			}
+			return false;
+		}
+		this.add = function() {
+			let d = Array.prototype.slice.call(arguments);
+			let cl = link.getAttributeNode("class");
+			if (cl == undefined)
+				return;
+			let dh = cl.value;
+			let list = dh.split(" ");
+			for ( let z in d) {
+				let h = d[z];
+				if (typeof (h) == "string" && (!ctain(list, h))) {
+					dh = dh + " " + h;
+				}
+			}
+			cl.value = dh;
+		}
+
+		this.contains = function(d) {
+			let cl = link.getAttribute("class").split(" ");
+			return ctain(cl, d);
+		};
+		this.item = function(i) {
+			let cl = link.getAttributeNode("class");
+			if (cl == undefined)
+				return;
+			let p = cl.value.split(" ");
+			if (i < p.length)
+				return p[i];
+			return null;
+		}
+		this.remove = function() {
+
+			let cl = link.getAttributeNode("class");
+			if (cl == undefined)
+				return;
+			let d = Array.prototype.slice.call(arguments);
+			let p = cl.value.split(" ");
+			let lg = p.length;
+			let txt = "";
+			for ( let i in p) {
+				if (!cmp(p[i], d)) {
+
+					txt = txt + p[i] + " ";
+
+				}
+			}
+			cl.value = txt.trim();
+		};
+		let cmp = function(a, b) {
+			for ( let i in b) {
+				if (a == b[i])
+					return true;
+			}
+			return false;
+
+		}
+		this.toString = function() {
+			let cl = link.getAttribute("class");
+			return cl;
+		}
+		let lg = function() {
+			let cl = link.getAttributeNode("class");
+			if (cl == undefined)
+				return 0;
+			var p = cl.value.split(" ").length;
+			return p;
+		}
+		Object.defineProperty(this, "length", {
+			get : lg
+		});
+		// Object.defineProperty(this, this, {
+		// 	get : function()
+		// 	{
+		// 		return this ;
+		// 	},
+		// 	set : function(d)
+		// 	{
+		// 		ele.setAttribute("class",d);
+		// 	}
+		// });
+	}
+	let textnode = function(a) {
+		this.nodeValue = a;
+		this.nodeName = "#text";
+		this.nodeType = ntext;
+	}
+
+	var _document = function() {
+		this.createElement = function(d) {
+			let p = new element(d, nelement);
+			return p;
+		}
+		this.createAttribute = function(d) {
+			let p = new attr(d);
+			return p;
+		}
+		this.createTextNode = function(d) {
+			let p = new textnode(d);
+			return p;
+		}
+		this._tree =function(ele,node)
+		{
+			let lps = ele.attributes().asList();
+			if (lps.size()>0) {
+				//print(node.nodeName)
+				node.attributes =_makeAtt() ;
+				for (let i in lps) {
+					let la = lps.get(i);
+					let k = document.createAttribute(la.getKey());
+					if(!la.getValue().equals(""))
+					{
+						k.value = la.getValue();
+					}
+					node.attributes[i]=k;
+				}
+				node._classList=new Clist(node);
+			}
+			let lp = ele.childNodes();
+			if(lp.size()>0)
+			{
+				for (let i in lp)
+				{
+					let ln = lp.get(i);
+					let z ;
+					if(ln.nodeName().equals("#text")||ln.nodeName().equals("#data"))
+					{
+						z= this.createTextNode(ele.outerHtml()) ;
+					}
+					else
+					{
+						z=this.createElement(ln.nodeName());
+						this._tree(ln,z);
+					}
+					node.appendChild(z);
+				}
 			}
 		}
 	}
+	var document = new _document() ;
+	
+	let element = function(_name, _type) {
 
-	this.contains = function(d)
-	{
-		if(cl==undefined) return ;
-		let cl =link.getAttribute("class");
-		return cl.contains(d);
-	};
-	this.item =function (i)
-	{
-		let cl =link.getAttributeNode("class");
-		if(cl==undefined) return ;
-		let p =cl.value.split(" ");
-		if(i<p.length) return p[i];
-		return null ;
-	}
-	this.remove = function(...d)
-	{
-
-		let cl =link.getAttributeNode("class");
-		if(cl==undefined) return ;
-		let p =cl.value.split(" ");
-		let lg=d.length ;
-		let txt ="";
-		for(let i in p)
-		{
-			if(!cmp(p[i],d))
-			{
-				if(i<lg)
-					txt=txt+p[i]+" ";
-				else txt=txt+p[i] ;
-			}
-		}
-		cl.value = txt ;
-	};
-	let cmp= function( a ,b)
-	{
-		for(let i in b)
-		{
-			if(a==b[i])
-				return true ;
-		}
-		return false ;
-
-	}
-	this.toString = function()
-	{
-		return cl.value ;
-	}
-	let lg = function()
-	{
-		let cl =link.getAttributeNode("class");
-		if(cl==undefined) return 0;
-		var p =cl.value.split(" ").length ;
-		return p ;
-	}
-	Object.defineProperty(this , "length",{get : lg }) ;
-}
-let textnode = function(a) {
-
-	this.nodeValue = a;
-	this.nodeName = "#text";
-	this.nodeType = ntext;
-	this.parentNode = null;
-	this.parentElementNode = null;
-	this.nextSibling = null;
-	this.nextElementSibling = null;
-	this.previousSibling = null;
-	this.previousElementSibling = null;
-}
-let element = function(_name, _type) {
-	this.offsetParent = "no need";
-	this.testDiv.offsetTop = "no need";
-
-	this.nodeValue;
-	let nName = _name.toLowerCase();
-	let nType = _type;
-
-	let tag = nName.toUpperCase();
-		// this.innerHTML;// luu thong tin text
-		this.accessKey; // khong can thiet
-		this.attributes = [];
-		let cli = new Clist(this);
+		let nName = _name.toLowerCase();
+		let nType = _type;
+		let tag = nName.toUpperCase();
 		this._state = false;
-		this.id;
-		// this.innerText; // giong node value
 		this.contenteditable = false;
 		this.namespaceURI = "http://www.w3.org/1999/xhtml ";
-		// this.lang ; add in <p> element
-		// css
 		this.clientWidth = 10;
 		this.clientHeight = 10;
 		this.clientTop = 1;
 		this.clientLeft = 1;
-		// node
-		this.childNodes = [];
-		this.childElementCount = 0;
-		this.children = [];
-		this.parentNode = null;
-		this.parentElementNode = null;
-		this.nextSibling = null;
-		this.nextElementSibling = null;
-		this.lastChild = null;
-		this.lastElementChild = null;
-		this.firstChild = null;
-		this.firstElementChild = null;
-		this.previousSibling = null;
-		this.previousElementSibling = null;
+		this.QuerySelector = function(d) {
+			let list = [];
+			let code = Extract.list(d);
+			this._query(list, code, true);
+			return list[0];
+		}
+		this.QuerySelectorAll= function(d) {
+			let list = [];
+			let code = Extract.list(d);
+			this._query(list, code, false);
+			return list;
+		}
+		this._query = function(list, code, qa) {
+			if (qa) {
+				if (list.length > 0)
+					return;
+			}
+			let gl = this._duyet(code);
 
-		// ckass webtest.query.Pice
-		let Extract = Java.type("webtest.query.Extract");
+			for ( let i in gl) {
+				let h = code.get(i);
+				if (gl[i]) {
+					if (this._checkQ(h, h.length() - 1, h.pnode()))
+						list[list.length] = this;
+				}
+			}
 
-		let 
-		let _compare = function(pice)
-		{
-			if(!nName.equals(pice.name)) return false ;
-			let h=pice.length();
-			let i=0 ;
-			while(i<h)
-			{
-				let p=pice.get(i);
-				if(p.equals("#"))
-				{
-					i=i+1;
-					let z = pice.get(i);
-					if(!this.id.equals(z)) return false ;
-					i=i+1;
-				}else if(p.equals("["))
-				{
-					i=i+1 ;
-					while(i<h)
+			if (this.firstElementChild != null)
+				this.firstElementChild._query(list, code, qa);
+			if (this.nextElementSibling != null)
+				this.nextElementSibling._Squery(list, gl, code, qa);
+
+		}
+		this._Squery = function(list, gl, code, qa) {
+			if (qa) {
+				if (list.length > 0)
+					return;
+			}
+			for ( let i in gl) {
+				let h = code.get(i);
+				if (gl[i]) {
+					if (this._checkQ(h, h.length() - 1, h.pnode()))
+						list[list.length] = this;
+				}
+			}
+			if (this.firstElementChild != null)
+				this.firstElementChild._query(list, code, qa);
+			if (this.nextElementSibling != null)
+				this.nextElementSibling._Squery(list, gl, code, qa);
+		}
+		this._duyet = function(code) {
+			let list = [];
+			let lg = code.length();
+			for (let i = 0; i < lg; i++) {
+				let ele = code.get(i);
+				list[i] = this._checkQ(ele, ele.pnode(), 0); // duyet den goc
+			}
+			return list;
+		}
+		this._checkQ = function(ele, d, gt) {
+			let pice = ele.get(d);
+			print("com pare "+_compare(pice))
+			if (!_compare(pice)) {
+
+				let h = pice.op;
+				if (h.equals(" ")) {
+					if (this.parentElement == null){
+						print("sdfgh");
+						return false;
+					}
+					else
+						return this.parentElement._checkQ(ele, d, gt);
+				} else if (h.equals("~")) {
+					if (this.previousElementSibling == null)
 					{
-						
-						let a=pice.get(i);
-						i=i+1;
-						let op=pice.get(i);
-						i=i+1 ;
-						let b=pice.get(i);
-						i=i+1;
-						if(!Extract.qCompare(a,b,op)) return false ;
-						if(pice.geti(i).equals("]")) break ;
+						print("next error");
+						return false;
+					}
+					else
+						return this.previousElementSibling._checkQ(ele, d, gt);
+				}
+				h = ele.get(d - 1).op;
+				if (d > gt) {
+
+					if (h.equals(" ")) {
+						if (this.parentElement == null) {
+							print("nex error") ;
+							return false;
+						}
+						else
+							return this.parentElement._checkQ(ele, d, gt);
+					} else if (h.equals("~")) {
+						if (this.previousElementSibling == null)
+						{
+							print("h next")
+							return false;
+						}
+						else
+							return this.previousElementSibling._checkQ(ele, d,gt);
 					}
 				}
-				else if(p.equals("."))
-				{
-					i=i+1 ;
+				return false;
+			} else {
+				if (d == gt)
+					return true;
+				if (d > gt) {
+					let h = ele.get(d - 1).op;
+					if (h.equals(" ") || h.equals(">")) {
+						if (this.parentElementNode == null){
+							print("equals node");
+							return false;
+						}
+						else
+							return this.parentElementNode._checkQ(ele, d - 1, gt);
+					} else if (h.equals("~") || h.equals("+")) {
+						if (this.previousElementSibling == null)
+						{
+							print("pre false")
+							return false;
+						}
+						else
+							return this.previousElementSibling._checkQ(ele,d - 1, gt);
+					}
+					return false
+				} else
+				return false;
+			}
+		}
+		let _compare = function(pice) {
+			if (!nName.equals(pice.name))
+			{
+				print("do ten")
+				return false;
+			}
+			let h = pice.length();
+			let i = 0;
+			while (i < h) {
+				let p = pice.get(i);
+				if (p.equals("#")) {
+					i = i + 1;
+					let z = pice.get(i);
+					if (!this.id.equals(z)){
+						print("do id")
+						return false;
+					}
+					i = i + 1;
+				} else if (p.equals("[")) {
+					i = i + 1;
+					while (i < h) {
+
+						let a = pice.get(i);
+						i = i + 1;
+						let op = pice.get(i);
+						i = i + 1;
+						let b = pice.get(i);
+						i = i + 1;
+						if (!Extract.qCompare(a, b, op))
+							return false;
+						if (pice.geti(i).equals("]"))
+							break;
+					}
+				} else if (p.equals(".")) {
+					i = i + 1;
 					let dot = pice.get(i);
-					if(!cli.contains(dot)) return false ;
-					i=i+1;
+					if(this._classList==null){
+						print("do class")
+						return false ;
+					}
+					if (!this._classList.contains(dot)){
+						print("ko chua class")
+						return false;
+					}
+					i = i + 1;
+				} else if (p.equals(":")||p.equals("::")) {
+					i = i + 1;
+
+					i = i + 1;
 				}
 			}
-		return true ;
-	}
+			return true;
+		}
+		
+		this.setAttribute = function(a, b) {
+			if (this.attributes == null) {
 
-	var _addAttr = function(a,b)
-	{
-		let k = this.attributes.length ;
-		for( let att in this.attributes)
-		{
-			if(this.attributes[att].name ==a.toLowerCase()) 
-			{
-				this.attributes[att].value = b ;
-				return ;
+				this.attributes = new _makeAtt();
+			}
+			let k = this.attributes.length;
+			let s = a.toLowerCase();
+			for ( let att in this.attributes) {
+				if (this.attributes[att].name == s) {
+					this.attributes[att].value = b;
+					return;
+				}
+			}
+			this.attributes[k] = new attr(s);
+			this.attributes[k].value = b;
+		}
+		var getclassName = function() {
+			return this.getAttribute("class");
+		}
+		var setclassName = function(d) {
+			this.setAttribute("class", d);
+		}
+		Object.defineProperty(this, "className", {
+			get : getclassName,
+			set : setclassName
+		});
+		Object.defineProperty(this, "classList", {
+			get : function() {
+				return this._classList;
+			},
+			set : setclassName
+		})
+		var getTabindex = function() {
+			return this.getAttribute("tabindex");
+		}
+		var setTabindex = function(d) {
+			this.setAttribute("tabindex", d);
+		}
+		var getTitle = function() {
+			return this.getAttribute("title");
+		}
+		var setTitle = function(d) {
+			this.setAttribute("title", d);
+		}
+		Object.defineProperty(this, "title", {
+			get : getTitle,
+			set : setTitle
+		});
+		var getStyle = function() {
+			return this.getAttribute("style");
+		}
+		Object.defineProperty(this, "style", {
+			get : getStyle
+		});
+		var getLang = function() {
+			return this.getAttribute("lang");
+		}
+		var setLang = function(d) {
+			this.setAttribute("lang", d);
+		}
+		Object.defineProperty(this, "lang", {
+			get : getLang,
+			set : setLang
+		});
+		this.getElementsByTagName = function(d) {
+			let list = [];
+			let p = d.toUpperCase();
+			this._findtag(p, list);
+			return list;
+		}
+		this._findtag = function(d, list) {
+
+			if (tag == d)
+				list[list.length] = this;
+			for ( let i in this.children) {
+				this.children[i]._findtag(d, list);
 			}
 		}
-		this.attributes[k]= new attr(a,b);
-	}
-	var getclassName =function()
-	{
-		return this.getAttribute("class");
-	}
-	var setclassName = function(d)
-	{
-		_addAttr("class",d);
-	}
-	Object.defineProperty(this , "className" , {get : getclassName , set : setclassName });
-	Object.defineProperty(this,"classList",{get : function(){return cli ;} , set : setclassName })
-	var getTabindex = function()
-	{
-		return this.getAttribute("tabindex");
-	}
-	var setTabindex = function(d)
-	{
-		_addAttr("tabindex",d);
-	}
-	var getTitle = function()
-	{
-		return this.getAttribute("title");
-	}
-	var setTitle = function(d)
-	{
-		_addAttr("title",d);
-	}
-	Object.defineProperty(this,"title",{ get:getTitle , set : setTitle }) ;
-	var getStyle = function() {
-		return this.getAttribute("style");
-	}
-	Object.defineProperty(this, "style", {
-		get : getStyle
-	});
-	var getLang = function() {
-		return this.getAttribute("lang");
-	}
-	var setLang = function(d) {
-		_addAttr("lang",d);
-	}
-	Object.defineProperty(this, "lang", {
-		get : getLang,
-		set : setLang
-	});
-	this.getElementsByTagName = function(d) {
-		let list = [];
-		let p = d.toUpperCase();
-		return list;
-	}
-	this._findtag = function(d, list) {
-		if (tag == d)
-			list[list.length] = this;
-		for ( let i in this.children) {
-			this.children[i]._findclass(d, list);
+		this.getElementsByClassName = function(d) {
+			let ret = [];
+			this._findclass(ret, d);
+			return ret;
 		}
-	}
-	this.getElementsByClassName = function(d) {
-		let ret = [];
-		this._findclass(ret, d);
-		return ret;
-	}
-	this._findclass = function(arr, cl) {
-		if (this.getAttribute("class") == cl)
-			arr[arr.length] = this;
-		for ( let i in this.children) {
-			this.children[i]._findclass(arr, cl);
-		}
-	}
-	var getId = function() {
-		return this.getAttribute("id");
-	}
-	var setId = function(d) {
-		_addAttr("id",d);
-	}
-	Object.defineProperty(this, "id", {
-		get : getId,
-		set : setId
-	});
-	this.getAttribute = function(d) {
-		for ( let p in this.attributes) {
-			if (this.attributes[p].name == d) {
-				return p.value;
+		this._findclass = function(arr, cl) {
+			if (this.getAttribute("class") == cl)
+				arr[arr.length] = this;
+			for ( let i in this.children) {
+				this.children[i]._findclass(arr, cl);
 			}
 		}
-	}
-	this.getAttributeNode = function(d) {
-		let la =d.toLowerCase();
-		for ( let p in this.attributes) {
-			if (this.attributes[p].name == la) {
-				return p;
+		var getId = function() {
+			return this.getAttribute("id");
+		}
+		var setId = function(d) {
+			this.setAttribute("id", d);
+		}
+		Object.defineProperty(this, "id", {
+			get : getId,
+			set : setId
+		});
+		this.getAttribute = function(d) {
+			for ( let p in this.attributes) {
+				if (this.attributes[p].name == d) {
+					return this.attributes[p].value;
+				}
 			}
 		}
-	}
-	this.hasAttribute = function(p) {
-		let d=p.toLowerCase() ;
-		for ( let i in this.attributes) {
-			if (d ==this.attributes[i])
-				return true;
+		this.getAttributeNode = function(d) {
+			let la = d.toLowerCase();
+			for ( let p in this.attributes) {
+				if (this.attributes[p].name == la) {
+					return this.attributes[p];
+				}
+			}
 		}
-		return false;
-	}
-	this.hasAttributes = function() {
-		return this.attributes.length > 0;
-	}
-	var getinnerText = function() {
-		var ret;
-		if (this.nodeType == ntext)
-			ret = nodeValue;
-		else {
-			for ( let s in this.childNodes) {
-				if (this.childNodes[s].style.display != "none")
+		this.hasAttribute = function(p) { // ok
+
+			let d = p.toLowerCase();
+			for ( let i in this.attributes) {
+				if (d == this.attributes[i].name)
+					return true;
+			}
+			return false;
+		}
+		this.hasAttributes = function() { // ok
+			return this.attributes.length > 0;
+		}
+		var getinnerText = function() {
+			let ret;
+			if (this.nodeType == ntext)
+				ret = nodeValue;
+			else {
+				for ( let s in this.childNodes) {
+					if (this.childNodes[s].style.display != "none")
+						ret = ret + this.childNodes[s].innerText;
+				}
+			}
+			return ret;
+		}
+		var getTextContent = function() {
+			var ret;
+			if (this.nodeType == ntext)
+				ret = nodeValue;
+			else {
+				for ( let s in this.childNodes) {
 					ret = ret + this.childNodes[s].innerText;
+				}
 			}
+			return ret;
 		}
-		return ret;
-	}
-	var getTextContent = function() {
-		var ret;
-		if (this.nodeType == ntext)
-			ret = nodeValue;
-		else {
-			for ( let s in this.childNodes) {
-				ret = ret + this.childNodes[s].innerText;
-			}
-		}
-		return ret;
-	}
-	var setinnerText = function(d) {
+		var setinnerText = function(d) {
 
-		this.childNodes.splice(0, this.childNodes.length);
-		this.children.splice(0, this.children.length);
-			// this.lastChild = null;
+			this.childNodes.splice(0, this.childNodes.length);
+			this.children.splice(0, this.children.length);
+			this.lastChild = null;
 			this.lastElementChild = null;
-			// this.firstChild = null;
+			this.firstChild = null;
 			this.firstElementChild = null;
 			let s = new textnode(d);
 			this.childNodes[0] = s;
@@ -351,16 +580,22 @@ let element = function(_name, _type) {
 			set : setinnerText
 		});
 		var getinnerhttp = function() {
-			let ret;
-			if (this.nodeType != nelement)
-				ret = this.nodeValue;
-			else {
-				ret = "<" + this.nodeName + ">";
-				for ( let s in this.childNodes) {
+			let ret="";
+			for ( let s in this.childNodes) {
+				if (this.childNodes[s].nodeType == nelement)
+				{
+					
+					ret = ret +"<" + this.childNodes[s].nodeName + ">";
 					ret = ret + this.childNodes[s].innerHTML;
+					ret = ret+"</" + this.childNodes[s].nodeName + ">";
 				}
-				ret = "</" + this.nodeName + ">";
+				else
+				{
+					ret =ret + this.childNodes[s].nodeValue ;
+				}
 			}
+
+			
 			return ret;
 
 		}
@@ -371,8 +606,9 @@ let element = function(_name, _type) {
 			this.lastElementChild = null;
 			this.firstChild = null;
 			this.firstElementChild = null;
+			
 			let node = _JGet.pInner(d);
-			_tree(node, this);
+			document._tree(node, this);
 
 		}
 		Object.defineProperty(this, "innerHTML", {
@@ -380,7 +616,7 @@ let element = function(_name, _type) {
 			set : setinnerhtml
 		});
 		this.isEqualNode = function(d) {
-			// return this.innerHTML == d.innerHTML
+			return this.innerHTML == d.innerHTML
 		}
 		this.isSameNode = function(d) {
 			return this == d;
@@ -473,6 +709,13 @@ let element = function(_name, _type) {
 			}
 		}
 		this.appendChild = function(d) {
+			d.parentNode = this;
+			if (this.nodeType == nelement)
+				d.parentElement = this;
+			if (this.childNodes == null) {
+				this.childNodes = [];
+				this.children = [];
+			}
 			let l = this.childNodes.length;
 			this.childNodes[l] = d;
 			if (l == 0) {
@@ -483,13 +726,15 @@ let element = function(_name, _type) {
 				this.childNodes[l - 1].nextSibling = this.childNodes[l];
 			}
 			if (d.nodeType == nelement) {
+
 				l = this.children.length;
+				this.children[l] = d;
 				if (l == 0) {
 					this.firstElementChild = d;
 				} else {
 					this.lastElementChild = d;
 					d.previousElementSibling = this.children[l - 1];
-					this.childNodes[l - 1].nextElementSibling = this.children[l];
+					this.children[l - 1].nextElementSibling = this.children[l];
 				}
 				this.childElementCount = l + 1;
 			}
@@ -498,90 +743,36 @@ let element = function(_name, _type) {
 		this.click = function() {
 			this._state = !this._state;
 		}
-		
+
 		// event = [] ;
-		this.attributes.getNamedItem = function(d) {
-			let l = this.length;
-			let i;
-			for (i = 0; i < l; i++) {
-				if (this[i].name == d)
-					return this[i];
-			}
-			return null;
-		}
-		this.attributes.item = function(d) {
-			return this[d];
-		}
-		this.attributes.removeNamedItem = function(d) {
-			let k = this.length;
-			let i;
-			for (i = 0; i < k; i++) {
-				if (this[i].name == d) {
-					this.splice(i, 1);
-					return;
-				}
-			}
-		}
-		this.attributes.setNamedItem = function(d) {
-			let k = this.length;
-			let i;
-			for (i = 0; i < k; i++) {
-				if (this[i].name == d.name) {
-					this[i]=d ;
-					return;
-				}
-			}
-			this[k]=d;
-		}
 		this.insertAdjacentElement = function(str, p) {
 			// chua ho tro
 		}
 		this.addEventListener = function(a, b) {
 
 		}
-
+		var getTagName = function() {
+			return tag;
+		}
 		Object.defineProperty(this, "tagName", {
 			get : getTagName
 		});
-		var getTagName = function() {
-			return tag;
+
+		let getNodeName = function() {
+			return nName;
 		}
 		Object.defineProperty(this, "nodeName", {
 			get : getNodeName
 		});
-		var getNodeName = function() {
-			return nName;
-		}
-		Object.defineProperty(this, "nodeType", {
-			get : getnodeType
-		});
 		var getnodeType = function() {
 			return nType;
 		}
+
+		Object.defineProperty(this, "nodeType", {
+			get : getnodeType
+		});
+
+		let d = 10;
 	}
 }
-	// let classattr = function (b)
-	// {
-	// 	let dname ="class" ;//.toLowerCase();
-	// 	let list = b.split(" ");
-	// 	this.specified = true;
-	// 	Object.defineProperty(this,"name",{value : dname }) ;
-	// 	this.isId= function()
-	// 	{
-	// 		return false ;
-	// 	}
-	// 	let setValue = function(d)
-	// 	{
-	// 		list = d.split(" ");
-	// 	}
-	// 	let getValue = function()
-	// 	{
-	// 		let p="";
-	// 		var d;
-	// 		for(d in list)
-	// 		{
-	// 			p=p+list[d]+" ";
-	// 		}
-	// 		return p ;
-	// 	}
-	// 	Object.defineProperty(this,"value",{get : getValue , set : setValue }) ;
+

@@ -12,13 +12,11 @@ public class Extract {
 	boolean fal = false;
 
 	public static void main(String[] args) {
-//		Code k = list("p > kf.ft .xx.ss.dd > v.\"dd\" + sh.dd h, sd + gg   cop + lol ");
-//		Ele d = k.get(0);
-//		Pice s = d.get(d.ope(4));
-//		System.out.println(s.name);
-		String a="sss-cjsssfk";
-		String  b="\"sss\"";
-		System.out.println(qCompare(a,b,"|="));
+		Code k = list("p>c>d>e> p>c>d>e >p>c>d>e> p>c>d>e> p>c>d.ss#ds>sjs~lol + e");
+		Ele d = k.get(0);
+		int cp = Compare.checkp(d.pc);
+		System.out.println(cp);
+//		}
 	}
 
 	public static Code list(String s) {
@@ -51,13 +49,13 @@ public class Extract {
 					arr.add(k);
 				}
 			}
-			System.out.println(arr.get(arr.size() - 1));
+			// System.out.println(arr.get(arr.size() - 1));
 		}
 		return arr;
 	}
 
-	public static boolean qCompare (String a, String k, String op) {
-		if (a .equals(""))
+	public static boolean qCompare(String a, String k, String op) {
+		if (a.equals(""))
 			return false;
 		StringBuilder d = new StringBuilder(k);
 		if (d.charAt(d.length() - 1) == '"')
@@ -162,6 +160,12 @@ public class Extract {
 				} while (ch == ' ');
 			} else
 				sb.append(" ");
+		} else if (ch == '+' || ch == '~' || ch == '>' || ch == ',') {
+			sb.append((char) ch);
+
+			do {
+				ch = get();
+			} while (ch == ' ');
 		} else {
 			sb.append((char) ch);
 			ch = get();

@@ -1,5 +1,5 @@
 "use strict";
-let System = Java.type("java.lang.System");
+// let System = Java.type("java.lang.System");
 load(System.getenv("WEBTEST") + "/jsource/dom/node.js");
 // cd /home/dccan/app/code/workspace/webtest/jsource/dom
 // jjs -cp /home/dccan/Desktop/web.jar --language=es6 Dom2.js
@@ -82,11 +82,3 @@ var k = System.currentTimeMillis();
 		}
 	}
 }
-
-var parser = new DOMParser();
-var doc = parser.praseFile();
-var x = doc.getElementsByTagName("title")[0].childNodes[0];
-var txt = x.nodeValue;
-print(txt);
-k = System.currentTimeMillis() - k;
-print("k= " + k);

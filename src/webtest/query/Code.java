@@ -11,7 +11,7 @@ public class Code {
 		return list[p];
 	}
 
-	public int size() {
+	public int length() {
 		return list.length;
 	}
 }
